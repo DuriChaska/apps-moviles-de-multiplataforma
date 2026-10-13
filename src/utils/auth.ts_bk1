@@ -1,0 +1,31 @@
+import { Platform } from 'react-native';
+
+const API_URL =
+  Platform.OS === 'android'
+    ? 'http://10.0.2.2:8000'   // emulador Android → tu PC
+    : 'http://127.0.0.1:8000'; // web
+
+export interface AuthResponse {
+  token: string;
+}
+
+export async function login(username: string, password: string): Promise<string> {
+  console.log('LOGIN:', username);
+
+  const response = await fetch(`${API_URL}/api-token-auth/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  });
+
+  console.log('LOGIN STATUS:', response.status);
+
+  if (!response.ok) {
+    throw new Error('Credenciales inválidas');
+  }
+
+  const data: AuthResponse = await response.json();
+  return data.token;
+}
